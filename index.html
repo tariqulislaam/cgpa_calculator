@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIUB CGPA Calculator</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .calculator {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center; /* Center-align text in the calculator */
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%; /* Set input width to 100% for full width within the container */
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+      display: inline-block;
+    }
+
+    .subject-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    button {
+      background-color: #0cd0f3;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .error {
+      margin-top: 20px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h2>AIUB CGPA Calculator</h2>
+    <p>
+     <h6>If you encounter any errors on my website, please feel free to contact me  <a href="mailto:23-54685-3@student.aiub.edu"><b style="color: #FF0000;">here</b></a>.
+  </h6></p><br><br>
+    <label for="totalMarks">Total Exam Marks</label>
+    <input type="number" id="totalMarks" value="100">
+
+    <label for="subjectQuantity">Number of Subjects</label>
+    <input type="number" id="subjectQuantity" oninput="generateSubjectInputs()">
+
+    <div id="subjectInputs"></div>
+
+    <button onclick="calculateCGPA()">Calculate CGPA</button>
+
+    <div id="result"></div>
+    <div id="error" class="error"></div>
+  </div>
+
+  <script>
+    function generateSubjectInputs() {
+      const subjectQuantity = document.getElementById('subjectQuantity').value;
+      const subjectInputsDiv = document.getElementById('subjectInputs');
+      subjectInputsDiv.innerHTML = '';
+  
+      for (let i = 1; i <= subjectQuantity; i++) {
+        const subjectInput = document.createElement('div');
+        subjectInput.className = 'subject-inputs';
+        subjectInput.innerHTML = `
+          <label for="subject${i}">Subject ${i}:</label>
+          <div>
+            <input type="number" id="subject${i}MidMarks" placeholder="Mid Marks" style="margin-right: 5px;">
+            <input type="number" id="subject${i}FinalMarks" placeholder="Final Marks" style="margin-right: 5px;">
+            <input type="number" id="subject${i}Credit" placeholder="Credit Hours">
+          </div>
+        `;
+        subjectInputsDiv.appendChild(subjectInput);
+      }
+    }
+  
+    function calculateCGPA() {
+      const totalExamMarks = parseFloat(document.getElementById('totalMarks').value);
+      const subjectQuantity = parseInt(document.getElementById('subjectQuantity').value);
+      let totalCredits = 0;
+      let totalWeightedGradePoints = 0;
+      let error = false;
+
+      for (let i = 1; i <= subjectQuantity; i++) {
+        const midMarks = parseFloat(document.getElementById(`subject${i}MidMarks`).value);
+        const finalMarks = parseFloat(document.getElementById(`subject${i}FinalMarks`).value);
+        const subjectCredit = parseFloat(document.getElementById(`subject${i}Credit`).value);
+        
+        if (midMarks > totalExamMarks || finalMarks > totalExamMarks) {
+          error = true;
+          break;
+        }
+
+        // Calculate weighted grade points based on the grading system
+        const weightedGradePoints = calculateWeightedGradePoints(midMarks, finalMarks, totalExamMarks);
+  
+        totalCredits += subjectCredit;
+        totalWeightedGradePoints += (weightedGradePoints * subjectCredit);
+      }
+
+      if (error) {
+        document.getElementById('result').textContent = '';
+        document.getElementById('error').textContent = 'Error: Marks cannot be greater than Total Exam Marks.';
+      } else {
+        const cgpa = (totalWeightedGradePoints / totalCredits).toFixed(2);
+        document.getElementById('result').textContent = `Your CGPA is: ${cgpa}`;
+        document.getElementById('error').textContent = '';
+      }
+    }
+  
+    function calculateWeightedGradePoints(midMarks, finalMarks, totalExamMarks) {
+      const totalMarks = 0.4 * midMarks + 0.6 * finalMarks;
+      const percentage = (totalMarks / totalExamMarks) * 100;
+
+      if (percentage >= 90) return 4.00;
+      else if (percentage >= 85) return 3.75;
+      else if (percentage >= 80) return 3.50;
+      else if (percentage >= 75) return 3.25;
+      else if (percentage >= 70) return 3.00;
+      else if (percentage >= 65) return 2.75;
+      else if (percentage >= 60) return 2.50;
+      else if (percentage >= 50) return 2.25;
+      else return 0.00;
+    }
+  </script>
+</body>
+</html>
