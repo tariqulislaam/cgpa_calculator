@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CGPA Calculator</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 20px;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="cgpaForm">
+    <label for="subjectQuantity">Number of Subjects:</label>
+    <input type="number" id="subjectQuantity" required>
+
+    <div id="subjectInputs"></div>
+
+    <button type="button" onclick="calculateCGPA()">Calculate CGPA</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    function generateSubjectInputs() {
+      const subjectQuantity = document.getElementById('subjectQuantity').value;
+      const subjectInputsContainer = document.getElementById('subjectInputs');
+      subjectInputsContainer.innerHTML = '';
+
+      for (let i = 1; i <= subjectQuantity; i++) {
+        const label = document.createElement('label');
+        label.textContent = `Enter marks for Subject ${i} (Midterm and Final, separated by comma):`;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `subject${i}`;
+        input.placeholder = 'e.g., 80, 90';
+        input.required = true;
+
+        subjectInputsContainer.appendChild(label);
+        subjectInputsContainer.appendChild(input);
+      }
+    }
+
+    function calculateCGPA() {
+      const subjectQuantity = document.getElementById('subjectQuantity').value;
+      let totalCredit = 0;
+      let totalWeightedGrade = 0;
+
+      for (let i = 1; i <= subjectQuantity; i++) {
+        const marks = document.getElementById(`subject${i}`).value.split(',').map(mark => parseFloat(mark.trim()));
+        const midMark = marks[0];
+        const finalMark = marks[1];
+
+        const totalMark = 0.4 * midMark + 0.6 * finalMark;
+        const grade = calculateGrade(totalMark);
+
+        const credit = parseFloat(prompt(`Enter credit for Subject ${i}`));
+        totalWeightedGrade += grade * credit;
+        totalCredit += credit;
+      }
+
+      const cgpa = totalWeightedGrade / totalCredit;
+
+      const resultContainer = document.getElementById('result');
+      resultContainer.innerHTML = `<p>Your CGPA is: ${cgpa.toFixed(2)}</p>`;
+    }
+
+    function calculateGrade(mark) {
+      if (mark >= 90) return 4.00;
+      if (mark >= 85) return 3.75;
+      if (mark >= 80) return 3.50;
+      if (mark >= 75) return 3.25;
+      if (mark >= 70) return 3.00;
+      if (mark >= 65) return 2.75;
+      if (mark >= 60) return 2.50;
+      if (mark >= 50) return 2.25;
+      return 0.00;
+    }
+
+    document.getElementById('subjectQuantity').addEventListener('input', generateSubjectInputs);
+  </script>
+
+</body>
+</html>
